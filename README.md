@@ -9,7 +9,7 @@ This is the python implementation for paper **A. Rasouli, I. Kotseruba, T. Kunic
 
 ### Table of contents
 * [Dependencies](#dependencies)
-* [Datasets](#datasets)
+* [PIE dataset](#PIE dataset)
 * [Train](#train)
 * [Test](#test)
 * [Citation](#citation)
@@ -27,17 +27,62 @@ the following external libraries:<br/>
 * numpy
 * pillow
 
+Install dependencies:
+`pip3 install -r requirements.txt`
+
+
 <a name="datasets"></a>
-## Datasets
-The code is trained and tested with [PIE](http://data.nvision2.eecs.yorku.ca/PIE_dataset/) and [JAAD](http://data.nvision2.eecs.yorku.ca/JAAD_dataset/) datasets.
+## PIE Dataset
+The code is trained and tested with [PIE](http://data.nvision2.eecs.yorku.ca/PIE_dataset/).
+
+Download annotations and video clips from the [PIE webpage](http://data.nvision2.eecs.yorku.ca/PIE_dataset/) and place them in the `PIE_dataset` directory. The folder structure should look like this:
+
+```
+PIE_dataset
+    annotations
+        set01
+        set02
+        ...
+    PIE_clips
+        set01
+        set02
+        ...
+
+```
+
+Videos will be automatically split into individual frames for training. This will require **1.1T** of free space on the hard drive.
+
+Create environment variables for PIE data root and add them to your `.bashrc`:
+
+```
+export PIE_PATH=/path/to/PIE/data/root
+export PIE_RAW_PATH=/path/to/PIE/data/PIE_clips/
+```
+
+Download PIE data interface `pie_data.py` from [PIE github](https://github.com/aras62/PIE) and copy it to `pie_utilities`.
 
 
 <a name="train"></a>
 ## Train
 
+To train all models from scratch and evaluate them on the test data use this command:
+```
+python src/train_test.py 1
+```
+This will train intention, speed and trajectory models separately and evaluate them on the test data.
+
+_Note: training intention model uses image data and requires 32GB RAM.
+
+Due to the random initialization of the networks and minor changes to the annotations there might be slight variation in the results.
+
 <a name="test"></a>
 ## Test
 
+To reproduce the results of our best model which combines pedestrian intention and vehicle speed for pedestrian trajectory prediction run this command:
+
+```
+python src/train_test.py 2
+```
 
 <a name="citation"></a>
 ## Citation
@@ -57,7 +102,8 @@ If you use our dataset, please cite:
 * **[Amir Rasouli](http://www.cse.yorku.ca/~aras/index.html)**
 * **[Iuliia Kotseruba](http://www.cse.yorku.ca/~yulia_k/)**
 
-Please send email to yulia_k@eecs.yorku.ca or aras@eecs.yorku.ca if there are any problems with downloading or using the data.
+Should you have any questions about downloading and using the data or the models, please feel free to raise an issue or send an email to aras@eecs.yorku.ca or yulia_k@eecs.yorku.ca.
+
 
 <a name="license"></a>
 ## License

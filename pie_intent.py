@@ -27,7 +27,6 @@ from keras import backend as K
 from keras import regularizers
 from keras.applications import vgg16
 from keras.callbacks import EarlyStopping
-from keras.callbacks import LearningRateScheduler
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import ReduceLROnPlateau
 from keras.layers import Concatenate
@@ -144,7 +143,7 @@ class PIEIntent(object):
         root = os.path.join(save_root_folder, type_save)
 
         if type_save == 'models':
-            save_path = os.path.join(root, model_name, 'pie', models_save_folder)
+            save_path = os.path.join(save_root_folder, 'pie', 'intention', models_save_folder)
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
             return os.path.join(save_path, file_name), save_path
@@ -205,47 +204,6 @@ class PIEIntent(object):
         self._decoder_input_size = config['decoder_input_size']
         self._decoder_dense_output_size = config['decoder_dense_output_size']
         self._decoder_seq_length = config['decoder_seq_length']
-
-
-    def log_configs(self, config_path, batch_size, epochs,
-                    lr, loss, learning_scheduler, opts):
-        """
-        Logs the parameters of the model and training
-        :param config_path: The path to save the file
-        :param batch_size: Batch size of training
-        :param epochs: Number of epochs for training
-        :param lr: Learning rate of training
-        :param loss: Type of loss function
-        :param learning_scheduler: Whether learning scheduler was used
-        :param opts: Model options (see get_data)
-        """
-        # Save config and training param files
-        with open(config_path, 'wt') as fid:
-            fid.write("####### Model options #######\n")
-            for k in opts:
-                fid.write("%s: %s\n" % (k, str(opts[k])))
-
-            fid.write("\n####### Network config #######\n")
-            fid.write("%s: %s\n" % ('hidden_units', str(self._num_hidden_units)))
-            fid.write("%s: %s\n" % ('reg_value ', str(self._regularizer_value)))
-            fid.write("%s: %s\n" % ('activation', str(self._activation)))
-            fid.write("%s: %s\n" % ('embed_size', str(self._embed_size)))
-            fid.write("%s: %s\n" % ('embed_dropout', str(self._embed_dropout)))
-
-            fid.write("%s: %s\n" % ('observe_length', str(self._observe_length)))
-            fid.write("%s: %s\n" % ('predict_length ', str(self._predict_length)))
-            fid.write("%s: %s\n" % ('encoder_feature_size', str(self._encoder_feature_size)))
-            fid.write("%s: %s\n" % ('decoder_feature_size', str(self._decoder_feature_size)))
-            fid.write("%s: %s\n" % ('prediction_size', str(self._prediction_size)))
-
-            fid.write("\n####### Training config #######\n")
-            fid.write("%s: %s\n" % ('batch_size', str(batch_size)))
-            fid.write("%s: %s\n" % ('epochs', str(epochs)))
-            fid.write("%s: %s\n" % ('lr', str(lr)))
-            fid.write("%s: %s\n" % ('loss', str(loss)))
-            fid.write("%s: %s\n" % ('learning_scheduler', str(learning_scheduler)))
-
-        print('Wrote configs to {}'.format(config_path))
 
     def load_images_and_process(self,
                                 img_sequences,
@@ -619,11 +577,13 @@ class PIEIntent(object):
         model_path, _ = self.get_path(type_save='models',
                                       model_name='convlstm_encdec',
                                       models_save_folder=model_folder_name,
-                                      file_name='model.h5')
+                                      file_name='model.h5',
+                                      save_root_folder='data')
         config_path, _ = self.get_path(type_save='models',
                                        model_name='convlstm_encdec',
                                        models_save_folder=model_folder_name,
-                                       file_name='configs')
+                                       file_name='configs',
+                                       save_root_folder='data')
 
         #Save config and training param files
         with open(config_path+'.pkl', 'wb') as fid:
@@ -669,7 +629,8 @@ class PIEIntent(object):
         history_path, saved_files_path = self.get_path(type_save='models',
                                                        model_name='convlstm_encdec',
                                                        models_save_folder=model_folder_name,
-                                                       file_name='history.pkl')
+                                                       file_name='history.pkl',
+                                                       save_root_folder='data')
 
         with open(history_path, 'wb') as fid:
             pickle.dump(history.history, fid, pickle.HIGHEST_PROTOCOL)
@@ -693,7 +654,6 @@ class PIEIntent(object):
                     configs = pickle.load(fid, encoding='bytes')
             train_params = configs[1]
             self.load_model_config(configs[0])
-            
                 # Create context model
             self.context_model = vgg16.VGG16(input_shape=(224, 224, 3),
                                              include_top=False,
@@ -708,8 +668,6 @@ class PIEIntent(object):
             test_model.summary()
 
             overlap = 1  # train_params ['overlap']
-
-            print(data_test.keys(), len(data_test['image']))
 
             test_target_data = []
             test_results = []
@@ -731,17 +689,16 @@ class PIEIntent(object):
                 data_test_chunk['bbox'] = data_test['bbox'][i:min(i+100,num_samples)]
 
                 test_data_chunk, test_target_data_chunk = self.get_test_data(data_test_chunk,
-                                                                            train_params,
-                                                                            self._sequence_length,
-                                                                            overlap)
+                                                                                    train_params,
+                                                                                    self._sequence_length,
+                                                                                    overlap)
 
                 tracks, images_chunk, bboxes_chunk, ped_ids_chunk = self.get_tracks(data_test_chunk,
-                                                                                   train_params['data_type'],
-                                                                                   self._sequence_length,
-                                                                                   overlap)
+                                                                                           train_params['data_type'],
+                                                                                           self._sequence_length,
+                                                                                           overlap)
 
 
-                print('TEST', )
                 test_results_chunk = test_model.predict(test_data_chunk,
                                                         batch_size=train_params['batch_size'],
                                                         verbose=1)
@@ -761,14 +718,11 @@ class PIEIntent(object):
                                         'res': test_results_chunk[i][0],
                                         'target': test_target_data_chunk[i]})
 
-            print(len(ped_ids), len(images), len(bboxes), len(test_results))
 
             acc = accuracy_score(test_target_data, np.round(test_results))
             f1 = f1_score(test_target_data, np.round(test_results))
 
-            print('acc:{} f1:{}'.format(acc, f1))
-
-            save_results_path = os.path.join(model_path, '{:.2f}'.format(acc)+'.pkl')
+            save_results_path = os.path.join(model_path, 'ped_intents.pkl')
             if not os.path.exists(save_results_path):
                 results = {'ped_id': ped_ids,
                            'images': images,

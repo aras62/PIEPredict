@@ -1,28 +1,20 @@
 """
 The code implementation of the paper:
 
-A. Rasouli, I. Kotseruba, T. Kunic, and J. Tsotsos, "PIE: A Large-Scale Dataset and Models for Pedestrian
-Intention Estimation and Trajectory Prediction", ICCV 2019.
+A. Rasouli, I. Kotseruba, T. Kunic, and J. Tsotsos, "PIE: A Large-Scale Dataset and Models for Pedestrian Intention Estimation and
+Trajectory Prediction", ICCV 2019.
 
-Copyright (c) 2019 Amir Rasouli
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+    http://www.apache.org/licenses/LICENSE-2.0
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 """
 import os
@@ -37,7 +29,6 @@ from keras.models import Model, load_model
 from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint
 from keras.optimizers import RMSprop
 from keras import regularizers
-
 
 class PIEPredict(object):
     """
@@ -116,6 +107,7 @@ class PIEPredict(object):
 
         #  Check the validity of keys selected by user as data type
         d = {}
+        print(dataset.keys(), data_types)
         for dt in data_types:
             try:
                 d[dt] = dataset[dt]
@@ -233,6 +225,7 @@ class PIEPredict(object):
                  file_name='',
                  save_folder='models',
                  dataset='pie',
+                 model_type='trajectory',
                  save_root_folder='data/'):
         """
         A path generator method for saving model and config data. It create directories if needed.
@@ -242,7 +235,7 @@ class PIEPredict(object):
         :param save_root_folder: The root folder
         :return: The full path for the model name and the path to the final folder
         """
-        save_path = os.path.join(save_root_folder, dataset, save_folder)
+        save_path = os.path.join(save_root_folder, dataset, model_type, save_folder)
         if not os.path.exists(save_path):
             os.makedirs(save_path)
         return os.path.join(save_path, file_name), save_path
@@ -325,18 +318,30 @@ class PIEPredict(object):
 
         # Set path names for saving configs and model
         model_folder_name = time.strftime("%d%b%Y-%Hh%Mm%Ss")
+
+        if 'bbox' in model_opts['prediction_type']:
+            model_type = 'trajectory'
+        else:
+            model_type = 'speed'
+        print(model_type)
+
         model_path, _ = self.get_path(save_folder=model_folder_name,
+                                      model_type=model_type,
                                       file_name='model.h5')
 
         # Save data parameters
         opts_path, _ = self.get_path(save_folder=model_folder_name,
+                                     model_type=model_type,
                                      file_name='model_opts.pkl')
+
+
         with open(opts_path, 'wb') as fid:
             pickle.dump(train_data['model_opts'], fid,
                         pickle.HIGHEST_PROTOCOL)
 
         # save training and model parameters
         config_path, _ = self.get_path(save_folder=model_folder_name,
+                                       model_type=model_type,
                                        file_name='configs.txt')
         self.log_configs(config_path, batch_size, epochs,
                          lr, loss, learning_scheduler,
@@ -383,6 +388,7 @@ class PIEPredict(object):
         print('Train model is saved to {}'.format(model_path))
 
         history_path, saved_files_path = self.get_path(save_folder=model_folder_name,
+                                                       model_type=model_type,
                                                        file_name='history.pkl')
 
         with open(history_path, 'wb') as fid:
@@ -419,9 +425,9 @@ class PIEPredict(object):
         perf['mse_last'] = performance[:, -1, :].mean(axis=None)
 
         # print("MSE  %f" % perf['mse'])
-        print("mse-15: %.2f\nmse-30: %.2f\nmse-45: %.2f"
-              % (perf['mse-15'], perf['mse-30'], perf['mse']))
-        print("MSE last %f" % perf['mse_last'])
+        # print("mse-15: %.2f\nmse-30: %.2f\nmse-45: %.2f"
+        #       % (perf['mse-15'], perf['mse-30'], perf['mse']))
+        # print("MSE last %f" % perf['mse_last'])
 
         if model_opts['prediction_type'][0] == 'bbox':
             #  Performance on centers (displacement)
@@ -446,10 +452,10 @@ class PIEPredict(object):
             perf['center_mse'] = c_performance.mean(axis=None)
             perf['center_mse_last'] = c_performance[:, -1, :].mean(axis=None)
 
-            # print("Center MSE  %f" % perf['center_mse'])
-            print("c-mse-15: %.2f\nc-mse-30: %.2f\nc-mse-45: %.2f"
-                  % (perf['c-mse-15'], perf['c-mse-30'], perf['center_mse']))
-            print("Center MSE last %f" % perf['center_mse_last'])
+            # # print("Center MSE  %f" % perf['center_mse'])
+            # print("c-mse-15: %.2f\nc-mse-30: %.2f\nc-mse-45: %.2f"
+            #       % (perf['c-mse-15'], perf['c-mse-30'], perf['center_mse']))
+            # print("Center MSE last %f" % perf['center_mse_last'])
 
         save_results_path = os.path.join(model_path,
                                          '{:.2f}.pkl'.format(perf['mse']))
@@ -475,12 +481,11 @@ class PIEPredict(object):
             with open(save_results_path, 'wb') as fid:
                 pickle.dump(results, fid, pickle.HIGHEST_PROTOCOL)
 
-        return perf['mse']
+        return perf
 
-    def test_final(self, data_test, model_path=''):
+    def test_final(self, data_test, traj_model_path='', intent_model_path='', speed_model_path=''):
 
-        intent_path = '/home/aras/PycharmProjects/release_code/test/'\
-                      'runs_with_pie_outputs/ped_intents.pkl'
+        intent_path = os.path.join(intent_model_path, 'ped_intents.pkl')
         with open(intent_path, 'rb') as fid:
             try:
                 intent = pickle.load(fid)
@@ -538,11 +543,11 @@ class PIEPredict(object):
                 # if the id does not exist just populate with 0.5
                 int_data[i] = np.array([[0.5]] * box_data['pred_target'].shape[1])
 
-        speed_path = '/home/aras/PycharmProjects/release_code/test/speed_models/pie_speed'
-        speed_model = load_model(os.path.join(speed_path, 'model.h5'))
+        #speed_path = '/home/aras/PycharmProjects/release_code/test/speed_models/pie_speed'
+        speed_model = load_model(os.path.join(speed_model_path, 'model.h5'))
 
-        bis_path = '/home/aras/PycharmProjects/release_code/test/box_intent_speed'
-        box_intent_speed_model = load_model(os.path.join(bis_path, 'model.h5'))
+        #bis_path = '/home/aras/PycharmProjects/release_code/test/box_intent_speed'
+        box_intent_speed_model = load_model(os.path.join(traj_model_path, 'model.h5'))
 
         ################## run speed model ####################
         model_opts['enc_input_type'] = ['obd_speed']
@@ -567,9 +572,9 @@ class PIEPredict(object):
         perf['mse-45'] = performance.mean(axis=None)
         perf['mse-last'] = performance[:, -1, :].mean(axis=None)
 
-        print("mse-15: %.2f\nmse-30: %.2f\nmse-45: %.2f"
-              % (perf['mse-15'], perf['mse-30'], perf['mse-45']))
-        print("mse-last %.2f\n" % (perf['mse-last']))
+        # print("mse-15: %.2f\nmse-30: %.2f\nmse-45: %.2f"
+        #       % (perf['mse-15'], perf['mse-30'], perf['mse-45']))
+        # print("mse-last %.2f\n" % (perf['mse-last']))
 
         #  Performance on centers (displacement)
         model_opts['normalize_bbox'] = False
@@ -597,13 +602,13 @@ class PIEPredict(object):
         perf['c-mse-45'] = c_performance.mean(axis=None)
         perf['c-mse-last'] = c_performance[:, -1, :].mean(axis=None)
 
-        print("c-mse-15: %.2f\nc-mse-30: %.2f\nc-mse-45: %.2f" \
-              % (perf['c-mse-15'], perf['c-mse-30'], perf['c-mse-45']))
-        print("c-mse-last: %.2f\n" % (perf['c-mse-last']))
+        # print("c-mse-15: %.2f\nc-mse-30: %.2f\nc-mse-45: %.2f" \
+        #       % (perf['c-mse-15'], perf['c-mse-30'], perf['c-mse-45']))
+        # print("c-mse-last: %.2f\n" % (perf['c-mse-last']))
 
-        save_results_path = os.path.join(model_path,
+        save_results_path = os.path.join(traj_model_path,
                                          '{:.2f}.pkl'.format(perf['mse-45']))
-        save_performance_path = os.path.join(model_path,
+        save_performance_path = os.path.join(traj_model_path,
                                              '{:.2f}.txt'.format(perf['mse-45']))
 
         with open(save_performance_path, 'wt') as fid:
@@ -623,7 +628,7 @@ class PIEPredict(object):
                            'performance': perf}
             with open(save_results_path, 'wb') as fid:
                 pickle.dump(results, fid, pickle.HIGHEST_PROTOCOL)
-        return perf['mse-45']  # performance
+        return perf  # performance
 
     def pie_encdec(self):
         """
