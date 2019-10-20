@@ -86,7 +86,7 @@ python src/train_test.py 2
 
 <a name="citation"></a>
 ## Citation
-If you use our dataset, please cite:
+If you use our dataset and/or models, please cite:
 ```
 @inproceedings{rasouli2017they,
   title={PIE: A Large-Scale Dataset and Models for Pedestrian Intention Estimation and Trajectory Prediction},
