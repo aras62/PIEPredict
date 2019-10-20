@@ -59,7 +59,7 @@ export PIE_PATH=/path/to/PIE/data/root
 export PIE_RAW_PATH=/path/to/PIE/data/PIE_clips/
 ```
 
-Download PIE data interface `pie_data.py` from [PIE github](https://github.com/aras62/PIE) and copy it to `pie_utilities`.
+Download PIE data interface `pie_data.py` from [PIE github](https://github.com/aras62/PIE).
 
 
 <a name="train"></a>
