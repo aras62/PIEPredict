@@ -9,7 +9,7 @@ This is the python implementation for paper **A. Rasouli, I. Kotseruba, T. Kunic
 
 ### Table of contents
 * [Dependencies](#dependencies)
-* [PIE dataset](#PIE dataset)
+* [PIE dataset](#PIE_dataset)
 * [Train](#train)
 * [Test](#test)
 * [Citation](#citation)
