@@ -68,7 +68,7 @@ Download PIE data interface `pie_data.py` from [PIE github](https://github.com/a
 
 To train all models from scratch and evaluate them on the test data use this command:
 ```
-python src/train_test.py 1
+python train_test.py 1
 ```
 This will train intention, speed and trajectory models separately and evaluate them on the test data.
 
@@ -82,7 +82,7 @@ Due to the random initialization of the networks and minor changes to the annota
 To reproduce the results of our best model which combines pedestrian intention and vehicle speed for pedestrian trajectory prediction run this command:
 
 ```
-python src/train_test.py 2
+python train_test.py 2
 ```
 
 <a name="citation"></a>
