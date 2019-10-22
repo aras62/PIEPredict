@@ -107,7 +107,6 @@ class PIEPredict(object):
 
         #  Check the validity of keys selected by user as data type
         d = {}
-        print(dataset.keys(), data_types)
         for dt in data_types:
             try:
                 d[dt] = dataset[dt]

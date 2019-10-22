@@ -20,7 +20,7 @@ This repository contains Python code and pretrained models for pedestrian intent
 
 <a name="dependencies"></a>
 ## Dependencies
-The interface is written and tested using python 3.5. The interface also requires
+The interface is written and tested on Ubuntu 16.04 with Python 3.5, CUDA 9 and cuDNN 7. The interface also requires
 the following external libraries:<br/>
 * tensorflow (tested with 1.9 and 1.14)
 * keras (tested with 2.1 and 2.2)
@@ -28,7 +28,17 @@ the following external libraries:<br/>
 * numpy
 * pillow
 
-Install dependencies:
+To install via virtual environment (recommended) follow these steps:
+
+- Install virtual environment `sudo apt-get install virtualenv`.
+
+- Create a virtual environment with Python3:
+
+```
+> virtualenv --system-site-packages -p python3 ./venv
+> source venv/bin/activate
+```
+- Install dependencies:
 `pip3 install -r requirements.txt`
 
 
