@@ -44,7 +44,7 @@ To install via virtual environment (recommended) follow these steps:
 
 <a name="datasets"></a>
 ## PIE Dataset
-The code is trained and tested with [Pedestian Intention Estimation (PIE) dataset](http://data.nvision2.eecs.yorku.ca/PIE_dataset/).
+The code is trained and tested with [Pedestrian Intention Estimation (PIE) dataset](http://data.nvision2.eecs.yorku.ca/PIE_dataset/).
 
 Download annotations and video clips from the [PIE webpage](http://data.nvision2.eecs.yorku.ca/PIE_dataset/) and place them in the `PIE_dataset` directory. The folder structure should look like this:
 
