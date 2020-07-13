@@ -5,7 +5,7 @@
 </p>
 
 
-This repository contains Python code and pretrained models for pedestrian intention and trajectory estimation presented in our paper [**A. Rasouli, I. Kotseruba, T. Kunic, and J. Tsotsos, "PIE: A Large-Scale Dataset and Models for Pedestrian Intention Estimation and Trajectory Prediction", ICCV 2019.**]()
+This repository contains Python code and pretrained models for pedestrian intention and trajectory estimation presented in our paper [**A. Rasouli, I. Kotseruba, T. Kunic, and J. Tsotsos, "PIE: A Large-Scale Dataset and Models for Pedestrian Intention Estimation and Trajectory Prediction", ICCV 2019.**](https://openaccess.thecvf.com/content_ICCV_2019/papers/Rasouli_PIE_A_Large-Scale_Dataset_and_Models_for_Pedestrian_Intention_Estimation_ICCV_2019_paper.pdf)
 
 
 ### Table of contents
