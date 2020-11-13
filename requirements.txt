@@ -3,7 +3,7 @@ opencv-python
 opencv-contrib-python
 wheel
 scikit-learn
-tensorflow-gpu==1.9.0
+tensorflow-gpu==2.3.1
 keras==2.2.1
 matplotlib
 prettytable
