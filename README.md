@@ -110,10 +110,10 @@ If you use our dataset and/or models, please cite:
 <a name="authors"></a>
 ## Corresponding authors
 
-* **[Amir Rasouli](http://www.cse.yorku.ca/~aras/index.html)**
+* **[Amir Rasouli](https://aras62.github.io/)**
 * **[Iuliia Kotseruba](http://www.cse.yorku.ca/~yulia_k/)**
 
-Should you have any questions about downloading and using the data or the models, please feel free to raise an issue or send an email to aras@eecs.yorku.ca or yulia_k@eecs.yorku.ca.
+Should you have any questions about downloading and using the data or the models, please feel free to raise an issue or send an email to arasouli.ai@gmail.com or yulia_k@eecs.yorku.ca.
 
 
 <a name="license"></a>
