@@ -549,7 +549,7 @@ class PIEIntent(object):
                                                                          data_subset = 'train'))
         val_img = self.load_images_and_process(val_d['images'],
                                                val_d['bboxes'],
-                                               train_d['ped_ids'],
+                                               val_d['ped_ids'],
                                                data_type='val',
                                                save_path=self.get_path(type_save='data',
                                                                        data_type='features'+'_'+data_opts['crop_type']+'_'+data_opts['crop_mode'],
